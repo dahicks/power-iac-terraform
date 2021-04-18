@@ -1,8 +1,10 @@
+# create custom network
 resource "google_compute_network" "demo" {
   name                    = "demo"
   auto_create_subnetworks = false
 }
 
+# create subnets based on regions variable
 resource "google_compute_subnetwork" "demo" {
   for_each = var.regions
   name          = "demo-${each.key}"
@@ -12,6 +14,7 @@ resource "google_compute_subnetwork" "demo" {
   private_ip_google_access = true
 }
 
+# router / nat required for nodes without external IP address to get out to internet
 resource "google_compute_router" "router" {
   for_each = var.regions
   name    = "demo"

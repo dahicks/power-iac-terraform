@@ -1,3 +1,5 @@
+# allow health check firewall rules
+# required so that Google Load Balancer can perform healthcheck on backend instances
 resource "google_compute_firewall" "demo" {
   name = "fw-allow-health-check"
   network = google_compute_network.demo.self_link
@@ -9,6 +11,7 @@ resource "google_compute_firewall" "demo" {
   source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ]
 }
 
+# Firewall to permit SSH traffic over IAP
 resource "google_compute_firewall" "demo-iap-ssh" {
   name = "fw-allow-iap-ssh"
   network = google_compute_network.demo.self_link
@@ -17,6 +20,7 @@ resource "google_compute_firewall" "demo-iap-ssh" {
   }  
   source_ranges = [ "35.235.240.0/20" ]
 }
+
 
 resource "google_compute_global_forwarding_rule" "demo" {
   name       = "global-rule"
@@ -51,6 +55,7 @@ resource "google_compute_url_map" "demo" {
   }
 }
 
+# Maps load balancer backend to compute instance group
 resource "google_compute_backend_service" "demo" {
   name        = "backend"
   port_name   = "http"
@@ -67,6 +72,7 @@ resource "google_compute_backend_service" "demo" {
   }  
 }
 
+# Compute instance Load Balancer Health check
 resource "google_compute_health_check" "demo" {
   name               = "check-backend"
   timeout_sec        = 1

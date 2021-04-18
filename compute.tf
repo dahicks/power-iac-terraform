@@ -1,7 +1,3 @@
- variable "name" {
-  default = "api-gtw-demo"
-}
-
 resource "google_service_account" "demo" {
   account_id   = "svc-${var.name}"
   display_name = "${var.name} Service Account"

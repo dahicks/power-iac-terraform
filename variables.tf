@@ -12,6 +12,10 @@ variable "regions" {
   }
 }
 
+variable "name" {
+  default = "api-gtw-demo"
+}
+
 variable "project_id" {
   type = string  
 }
