@@ -13,6 +13,5 @@ variable "regions" {
 }
 
 variable "project_id" {
-  type = string
-  default = "mh-terraform-demo"
+  type = string  
 }
