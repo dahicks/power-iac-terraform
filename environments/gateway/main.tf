@@ -21,15 +21,11 @@ module "gateway" {
   name = var.name
 }
 
-module "loadbalancer" {
-  source = "../../modules/loadbalancer"
+locals {
   instance_groups = [ for k,v in var.regions: module.gateway[k].instance_groups ]
 }
 
-output "instance_groups" {
-  value = { for k,v in var.regions: k => module.gateway[k].instance_groups }
-}
-
-output "load_balancer" {
-  value = module.loadbalancer.load_balancer_ip
+module "loadbalancer" {
+  source = "../../modules/loadbalancer"
+  instance_groups = local.instance_groups
 }
