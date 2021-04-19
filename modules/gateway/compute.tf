@@ -1,17 +1,10 @@
-resource "google_service_account" "demo" {
-  account_id   = "svc-${var.name}"
-  display_name = "${var.name} Service Account"
-}
-
 data "google_compute_image" "demo" {
   family  = "cos-stable"
   project = "cos-cloud"
 }
 
 resource "google_compute_instance_template" "demo" {
-  for_each = var.regions
-
-  name_prefix  = "${var.name}-envoy-${each.key}"
+  name_prefix  = "${var.name}-envoy-${var.region}"
   machine_type = "f1-micro"
   tags = [ "fw-allow-health-check" ]
 
@@ -22,18 +15,18 @@ resource "google_compute_instance_template" "demo" {
 
   service_account {
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-    email  = google_service_account.demo.email
+    email  = var.service_account
     scopes = ["cloud-platform"]
   }
 
   network_interface {
-    subnetwork = google_compute_subnetwork.demo[each.key].self_link
+    subnetwork = var.subnetwork
   }
 
   metadata = {
-    "user-data" = templatefile("${path.module}/files/cloud-init.yaml.tpl",
+    "user-data" = templatefile("${path.module}/files/envoy/cloud-init.yaml.tpl",
         {
-          envoy_config = indent(4, file("${path.module}/files/envoy_demo.yaml"))
+          envoy_config = indent(4, file("${path.module}/files/envoy/envoy_demo.yaml"))
         }
       )
     }
@@ -43,15 +36,29 @@ resource "google_compute_instance_template" "demo" {
   }
 }
 
-resource "google_compute_region_instance_group_manager" "demo" {  
-  for_each = var.regions
-  name = "${var.name}-${each.key}-igm"
+# Compute instance Load Balancer Health check
+resource "google_compute_health_check" "demo" {
+  name               = "ig-healthcheck-${var.region}"
+  timeout_sec        = 1
+  check_interval_sec = 15
 
-  base_instance_name         = "${each.key}-${var.name}-envoy"
-  region                     = each.key
+  http_health_check {
+    port = 10000
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "google_compute_region_instance_group_manager" "demo" {  
+  name = "${var.name}-${var.region}-igm"
+
+  base_instance_name         = "${var.region}-${var.name}-envoy"
+  region                     = var.region
 
   version {
-    instance_template = google_compute_instance_template.demo[each.key].self_link
+    instance_template = google_compute_instance_template.demo.self_link
   }
 
   target_size  = 1
