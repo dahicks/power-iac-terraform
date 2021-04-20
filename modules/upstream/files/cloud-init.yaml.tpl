@@ -1,31 +1,20 @@
 #cloud-config
 
-users:
-- name: envoy
-  uid: 2000
-
 write_files:
-- path: /etc/envoy/envoy_demo.yaml
-  permissions: 0644
-  owner: envoy
-  content: |
-    ${ envoy_config }
-
-- path: /etc/systemd/system/envoy.service
+- path: /etc/systemd/system/echo.service
   permissions: 0644
   owner: root
   content: |
     [Unit]
-    Description=Envoy Proxy
+    Description=Start a simple http echo docker container
     After=network-online.target
-    Wants=network-online.target    
+    Wants=network-online.target
 
     [Service]
-    ExecStart=/usr/bin/docker run --rm -u 2000 \
-      -p 10000:10000 \
+    ExecStart=/usr/bin/docker run --rm \
+      -p 3000:80 \
       --name=%n \
-      -v /etc/envoy:/etc/envoy \
-      envoyproxy/envoy:v1.18.2 -c /etc/envoy/envoy_demo.yaml
+      ealen/echo-server
     ExecStop=/usr/bin/docker stop %n
     ExecStopPost=/usr/bin/docker rm %n
     Restart=always
@@ -33,11 +22,11 @@ write_files:
     TimeoutStartSec=30s
     
     [Install]
-    WantedBy=multi-user.target
+    WantedBy=multi-user.target    
 
 runcmd:
 - systemctl daemon-reload
-- systemctl start envoy.service
+- systemctl start echo.service
 
 # Optional once-per-boot setup. For example: mounting a PD.
 bootcmd:

@@ -3,8 +3,7 @@ variable "project" {
 }
 
 variable "name" {
-  type = string
-  default = "api-gtw-demo"
+  type = string  
 }
 
 variable "network" {
@@ -23,9 +22,6 @@ variable "service_account" {
   type = string
 }
 
-variable "upstream" {
-  type = object({
-    address = string,
-    port = number   
-  })
-}
+// variable "regions" {
+  
+// }

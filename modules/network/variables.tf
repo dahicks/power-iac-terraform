@@ -9,3 +9,7 @@ variable "regions" {
 variable "project" {
   type = string  
 }
+
+variable "name" {
+  type = string
+}

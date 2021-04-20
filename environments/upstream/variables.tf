@@ -4,14 +4,14 @@ variable "project" {
 
 variable "name" {
   type = string
-  default = "gateway"
+  default = "echo"
 }
 
 variable "regions" {
   type = object ({
-    us-east1 = object({ cidr = string})
-    us-central1 = object({ cidr = string})
-    us-west1 = object({ cidr = string})
+    us-east1 = object({ cidr = string })
+    us-central1 = object({ cidr = string })
+    us-west1 = object({ cidr = string })
   })
 
   default = {

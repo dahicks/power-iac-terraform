@@ -5,7 +5,7 @@ resource "google_compute_firewall" "demo" {
   network = google_compute_network.demo.self_link
   allow {
     protocol = "tcp"
-    ports = ["10000"]
+    ports = ["10000","3000"]
   }
   target_tags = [ "fw-allow-health-check" ]
   source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ]
@@ -21,17 +21,26 @@ resource "google_compute_firewall" "demo-iap-ssh" {
   source_ranges = [ "35.235.240.0/20" ]
 }
 
+resource "google_compute_firewall" "allow-all-internal" {  
+  name = "fw-allow-all-internal"
+  network = google_compute_network.demo.self_link
+  allow {
+    protocol = "tcp"
+  }
+  source_tags = ["internal"]
+  target_tags = ["internal"]
+}
 
 # create custom network
 resource "google_compute_network" "demo" {
-  name                    = "demo"
+  name                    = var.name
   auto_create_subnetworks = false
 }
 
 # create subnets based on regions variable
 resource "google_compute_subnetwork" "demo" {
   for_each = var.regions
-  name          = "demo-${each.key}"
+  name          = "${var.name}-demo-${each.key}"
   ip_cidr_range = each.value.cidr
   region        = each.key
   network       = google_compute_network.demo.id
@@ -41,7 +50,7 @@ resource "google_compute_subnetwork" "demo" {
 # router / nat required for nodes without external IP address to get out to internet
 resource "google_compute_router" "router" {
   for_each = var.regions
-  name    = "demo"
+  name    = "${var.name}-demo-${each.key}"
   region  = google_compute_subnetwork.demo[each.key].region
   network = google_compute_network.demo.id
 
@@ -52,7 +61,7 @@ resource "google_compute_router" "router" {
 
 resource "google_compute_router_nat" "nat" {
   for_each = var.regions
-  name                               = "demo"
+  name                               = "${var.name}-demo-${each.key}"
   router                             = google_compute_router.router[each.key].name
   region                             = google_compute_router.router[each.key].region
   nat_ip_allocate_option             = "AUTO_ONLY"

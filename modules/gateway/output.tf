@@ -1,3 +1,3 @@
 output "instance_groups" {
-  value =  google_compute_region_instance_group_manager.demo.instance_group
+  value =  google_compute_region_instance_group_manager.envoy.instance_group
 }

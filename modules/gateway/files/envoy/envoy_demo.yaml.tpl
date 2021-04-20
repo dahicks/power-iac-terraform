@@ -22,31 +22,26 @@ static_resources:
             name: local_route
             virtual_hosts:
             - name: local_service
-              domains: ["*"]
+              domains: ['*","echo.service.internal"]
               routes:
               - match:
                   prefix: "/"
                 route:
-                  host_rewrite_literal: www.envoyproxy.io
-                  cluster: service_envoyproxy_io
+                  host_rewrite_literal: echo.service.internal
+                  cluster: service_echo
 
   clusters:
-  - name: service_envoyproxy_io
+  - name: service_echo
     connect_timeout: 30s
-    type: LOGICAL_DNS
+    type: STATIC
     # Comment out the following line to test on v6 networks
     dns_lookup_family: V4_ONLY
     load_assignment:
-      cluster_name: service_envoyproxy_io
+      cluster_name: service_echo
       endpoints:
       - lb_endpoints:
         - endpoint:
             address:
               socket_address:
-                address: www.envoyproxy.io
-                port_value: 443
-    transport_socket:
-      name: envoy.transport_sockets.tls
-      typed_config:
-        "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
-        sni: www.envoyproxy.io
+                address: ${address}
+                port_value: ${port}

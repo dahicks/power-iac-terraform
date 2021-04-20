@@ -14,6 +14,7 @@ terraform init
 ```
 
 # Set Google Project ID for Provider
+This will default the active project in your gcloud configuration
 ```
 export TF_VAR_project=`gcloud config list --format="value(core.project)"`
 ```

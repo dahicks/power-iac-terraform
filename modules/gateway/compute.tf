@@ -3,10 +3,10 @@ data "google_compute_image" "demo" {
   project = "cos-cloud"
 }
 
-resource "google_compute_instance_template" "demo" {
+resource "google_compute_instance_template" "envoy" {
   name_prefix  = "${var.name}-envoy-${var.region}"
   machine_type = "f1-micro"
-  tags = [ "fw-allow-health-check" ]
+  tags = [ "fw-allow-health-check","internal" ]
 
   // boot disk
   disk {
@@ -26,7 +26,10 @@ resource "google_compute_instance_template" "demo" {
   metadata = {
     "user-data" = templatefile("${path.module}/files/envoy/cloud-init.yaml.tpl",
         {
-          envoy_config = indent(4, file("${path.module}/files/envoy/envoy_demo.yaml"))
+          envoy_config = indent(4, templatefile("${path.module}/files/envoy/envoy_demo.yaml.tpl", {
+            address = var.upstream.address
+            port = var.upstream.port
+          }))
         }
       )
     }
@@ -37,8 +40,8 @@ resource "google_compute_instance_template" "demo" {
 }
 
 # Compute instance Load Balancer Health check
-resource "google_compute_health_check" "demo" {
-  name               = "ig-healthcheck-${var.region}"
+resource "google_compute_health_check" "envoy" {
+  name               = "ig-healthcheck-envoy-${var.name}-${var.region}"
   timeout_sec        = 1
   check_interval_sec = 15
 
@@ -51,14 +54,14 @@ resource "google_compute_health_check" "demo" {
   }
 }
 
-resource "google_compute_region_instance_group_manager" "demo" {  
-  name = "${var.name}-${var.region}-igm"
+resource "google_compute_region_instance_group_manager" "envoy" {  
+  name = "${var.name}-${var.region}-envoy-igm"
 
   base_instance_name         = "${var.region}-${var.name}-envoy"
   region                     = var.region
 
   version {
-    instance_template = google_compute_instance_template.demo.self_link
+    instance_template = google_compute_instance_template.envoy.self_link
   }
 
   target_size  = 1
@@ -69,11 +72,11 @@ resource "google_compute_region_instance_group_manager" "demo" {
   }
 
   auto_healing_policies {
-    health_check      = google_compute_health_check.demo.id
+    health_check      = google_compute_health_check.envoy.id
     initial_delay_sec = 300
   }
 
   depends_on = [
-    google_compute_instance_template.demo
+    google_compute_instance_template.envoy
   ]
 }
