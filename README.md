@@ -33,7 +33,7 @@ terraform apply -auto-approve
 ```
 LB_IP=`terraform output -json | jq -r .load_balancer.value`
 while true; do echo 'waiting for lb to come up...'; nc -w1 ${LB_IP} 80; if [[ $? > 0 ]]; then continue; else break; fi; sleep 5; done
-open http://${LB_IP}
+curl -H "Host: echo.service.internal" http://${LB_IP}
 ```
 
 # Clean Up

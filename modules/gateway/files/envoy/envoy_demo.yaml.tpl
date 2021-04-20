@@ -22,7 +22,7 @@ static_resources:
             name: local_route
             virtual_hosts:
             - name: local_service
-              domains: ['*","echo.service.internal"]
+              domains: ["*","echo.service.internal"]
               routes:
               - match:
                   prefix: "/"
