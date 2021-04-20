@@ -20,3 +20,7 @@ variable "regions" {
     us-west1 = {cidr="10.138.0.0/20" } 
   }
 }
+
+locals {
+  instance_groups = [ for k,v in var.regions: module.gateway[k].instance_groups ]
+}
