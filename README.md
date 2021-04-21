@@ -26,19 +26,25 @@ export TF_VAR_project=[YOUR GOOGLE CLOUD PROJECT ID]
 terraform plan
 ```
 
-# Apply Changes
+### Apply Changes
 ```
 terraform apply -auto-approve
 ```
 
-# Grab Load Balancer IP from Terraform output and browse
+### Grab Load Balancer IP from Terraform output and browse
+
+In the following code snippet, we'll retrieve the external load balancer IP from the Terraform state and use it to make an HTTP request to our upstream service through the newly built API Gateway.  
+
+> Note: It can take 5-10 minutes for the Load Balancer to come up.  Until that happens, you may receive 4XX/5XX servers.
+
 ```
 LB_IP=`terraform output -json | jq -r .load_balancer.value`
-while true; do echo 'waiting for lb to come up...'; nc -w1 ${LB_IP} 80; if [[ $? > 0 ]]; then continue; else break; fi; sleep 5; done
-curl -H "Host: echo.service.internal" http://${LB_IP}
+while true; do curl -H "Host: echo.service.internal" http://${LB_IP}; printf "\n\n"; sleep 10; done
 ```
 
-# Clean Up
+### Clean Up
+
+The following command will tear down all resources created/managed in Terraform's state.
 ```
 terraform destroy -auto-approve
 ```
