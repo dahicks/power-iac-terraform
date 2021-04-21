@@ -1,3 +1,7 @@
+# Power of IaC with Terraform
+
+![Infrastructure Breakdown](docs/images/breakdown.jpg)
+
 ## Pre-requisites
 
 This demo leverages the following set of tools.  Links have been provided for instructions on installation.
