@@ -1,5 +1,5 @@
-output "echo_ip_address" {
-  value = { for k,v in var.regions : k => module.upstream[k].echo_ip_address }
+output "upstream_internal_addresses" {
+  value = { for k,v in var.regions : k => module.upstream[k].upstream_ip_address }
 }
 
 output "load_balancer" {
