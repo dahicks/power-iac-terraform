@@ -1,3 +1,4 @@
+# reserved internal IP address for internal load balancer
 resource "google_compute_address" "upstream" {
   name         = "upstream-internal"
   region       = var.region
@@ -5,6 +6,8 @@ resource "google_compute_address" "upstream" {
   purpose      = "GCE_ENDPOINT"
   subnetwork   = var.subnetwork
 }
+# forwarding rule defines ingress point for traffic
+# bound for the upstream backend service
 resource "google_compute_forwarding_rule" "upstream" {
   all_ports             = false
   allow_global_access   = true
@@ -22,8 +25,10 @@ resource "google_compute_forwarding_rule" "upstream" {
   subnetwork = var.subnetwork
   timeouts {}
 }
+# health check monitors availability of upstream
+# service
 resource "google_compute_health_check" "upstream" {
-  name                = "echo-hc-${var.region}"
+  name                = "upstream-hc-${var.region}"
   check_interval_sec  = 15
   timeout_sec         = 5
   healthy_threshold   = 2
@@ -33,6 +38,8 @@ resource "google_compute_health_check" "upstream" {
     port = "3000"
   }
 }
+# regional backend service
+# manages traffic distribution across virtual machines in the region
 resource "google_compute_region_backend_service" "upstream" {
   affinity_cookie_ttl_sec         = 0
   connection_draining_timeout_sec = 300

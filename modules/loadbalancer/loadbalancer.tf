@@ -1,13 +1,10 @@
+# forwarding rule exposes LB to internet on port 80
 resource "google_compute_global_forwarding_rule" "demo" {
   name       = "global-rule"
   target     = google_compute_target_http_proxy.demo.id
   port_range = "80"
 }
-resource "google_compute_target_http_proxy" "demo" {  
-  name        = "target-proxy"
-  description = "a description"
-  url_map     = google_compute_url_map.demo.id
-}
+# url map required for LB to route inbound request(s) to backend services
 resource "google_compute_url_map" "demo" {  
   name            = "url-map-target-proxy"
   description     = "a description"
@@ -27,6 +24,12 @@ resource "google_compute_url_map" "demo" {
       service = google_compute_backend_service.demo.id
     }
   }
+}
+# target proxy pushes requests from URL map to backend service
+resource "google_compute_target_http_proxy" "demo" {  
+  name        = "target-proxy"
+  description = "a description"
+  url_map     = google_compute_url_map.demo.id
 }
 # Maps load balancer backend to compute instance group
 resource "google_compute_backend_service" "demo" {
