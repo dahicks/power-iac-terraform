@@ -1,25 +1,25 @@
-Pre-requisites
+## Pre-requisites
 
-This demo leverages the following set of tools.  Links have been provided for instructions on installation
+This demo leverages the following set of tools.  Links have been provided for instructions on installation.
 
 1. [Terraform](https://www.terraform.io/downloads.html)
 2. [jq](https://stedolan.github.io/jq/download/)
 3. [gcloud](https://cloud.google.com/sdk/docs/quickstart)
 
-# Inititalize Terraform Provider
+### Inititalize Terraform Provider
 
 ```
-cd  environments/gateway
+cd environments/gateway
 terraform init
 ```
 
-# Set Google Project ID for Provider
+### Set Google Project ID for Provider
 This will default the active project in your gcloud configuration
 ```
 export TF_VAR_project=`gcloud config list --format="value(core.project)"`
 ```
 
-# Generate Plan
+### Generate Plan
 ```
 terraform plan
 ```

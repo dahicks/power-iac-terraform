@@ -1,8 +1,9 @@
-data "google_compute_image" "echo" {
+# look latest version of COS image
+data "google_compute_image" "cos" {
   family  = "cos-stable"
   project = "cos-cloud"
 }
-
+# instance to orchestrate vm instance creation / maintenance
 resource "google_compute_region_instance_group_manager" "echo" {    
   name = "${var.name}-${var.region}-igm"
 
@@ -37,7 +38,7 @@ resource "google_compute_region_instance_group_manager" "echo" {
     google_compute_instance_template.echo
   ]
 }
-
+# template defines configuration characteristics of VM
 resource "google_compute_instance_template" "echo" {
   name_prefix  = "${var.name}-${var.region}"
   machine_type = "f1-micro"

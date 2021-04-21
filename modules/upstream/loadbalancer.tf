@@ -5,7 +5,6 @@ resource "google_compute_address" "echo-internal-tcp" {
   purpose      = "GCE_ENDPOINT"
   subnetwork   = var.subnetwork
 }
-
 resource "google_compute_forwarding_rule" "echo-internal-tcp" {
   all_ports             = false
   allow_global_access   = true
@@ -23,11 +22,6 @@ resource "google_compute_forwarding_rule" "echo-internal-tcp" {
   subnetwork = var.subnetwork
   timeouts {}
 }
-
-output "echo_ip_address" {
-  value = google_compute_forwarding_rule.echo-internal-tcp.ip_address
-}
-
 resource "google_compute_health_check" "echo" {
   name                = "echo-hc-${var.region}"
   check_interval_sec  = 15
@@ -39,7 +33,6 @@ resource "google_compute_health_check" "echo" {
     port = "3000"
   }
 }
-
 resource "google_compute_region_backend_service" "echo-internal-tcp" {
   affinity_cookie_ttl_sec         = 0
   connection_draining_timeout_sec = 300
