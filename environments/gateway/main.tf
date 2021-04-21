@@ -34,7 +34,7 @@ module "gateway" {
   region = each.key
   name = var.name
   upstream = {
-    address = module.upstream[each.key].echo_ip_address  
+    address = module.upstream[each.key].upstream_ip_address  
     port = 3000
   }
 }
