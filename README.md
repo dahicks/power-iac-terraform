@@ -6,6 +6,8 @@ This demo leverages the following set of tools.  Links have been provided for in
 2. [jq](https://stedolan.github.io/jq/download/)
 3. [gcloud](https://cloud.google.com/sdk/docs/quickstart)
 
+We are leveraging [Google Cloud Platform](https://cloud.google.com/free/) to deploy our infrastructure resources.  You'll need to have access to a Google Cloud Platform project in order to complete the exercise.
+
 ### Inititalize Terraform Provider
 
 ```
@@ -16,7 +18,7 @@ terraform init
 ### Set Google Project ID for Provider
 This will default the active project in your gcloud configuration
 ```
-export TF_VAR_project=`gcloud config list --format="value(core.project)"`
+export TF_VAR_project=[YOUR GOOGLE CLOUD PROJECT ID]
 ```
 
 ### Generate Plan

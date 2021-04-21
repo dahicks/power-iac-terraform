@@ -19,7 +19,7 @@ module "upstream" {
   subnetwork = module.network.network_details.subnets[each.key]
   service_account = google_service_account.demo.email
   region = each.key  
-  name = var.name
+  name = "upstream"
 }
 
 

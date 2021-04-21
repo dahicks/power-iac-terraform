@@ -1,15 +1,15 @@
-resource "google_compute_address" "echo-internal-tcp" {
-  name         = "dialtone-internal-http"
+resource "google_compute_address" "upstream" {
+  name         = "upstream-internal"
   region       = var.region
   address_type = "INTERNAL"
   purpose      = "GCE_ENDPOINT"
   subnetwork   = var.subnetwork
 }
-resource "google_compute_forwarding_rule" "echo-internal-tcp" {
+resource "google_compute_forwarding_rule" "upstream" {
   all_ports             = false
   allow_global_access   = true
-  backend_service       = google_compute_region_backend_service.echo-internal-tcp.id
-  ip_address            = google_compute_address.echo-internal-tcp.address
+  backend_service       = google_compute_region_backend_service.upstream.id
+  ip_address            = google_compute_address.upstream.address
   ip_protocol           = "TCP"
   load_balancing_scheme = "INTERNAL"
   name                  = "${var.name}-internal-tcp"
@@ -22,7 +22,7 @@ resource "google_compute_forwarding_rule" "echo-internal-tcp" {
   subnetwork = var.subnetwork
   timeouts {}
 }
-resource "google_compute_health_check" "echo" {
+resource "google_compute_health_check" "upstream" {
   name                = "echo-hc-${var.region}"
   check_interval_sec  = 15
   timeout_sec         = 5
@@ -33,12 +33,12 @@ resource "google_compute_health_check" "echo" {
     port = "3000"
   }
 }
-resource "google_compute_region_backend_service" "echo-internal-tcp" {
+resource "google_compute_region_backend_service" "upstream" {
   affinity_cookie_ttl_sec         = 0
   connection_draining_timeout_sec = 300
-  health_checks                   = [google_compute_health_check.echo.id]
+  health_checks                   = [google_compute_health_check.upstream.id]
   load_balancing_scheme           = "INTERNAL"
-  name                            = "echo-internal-tcp"
+  name                            = "upstream-internal"
   protocol                        = "TCP"
   region                          = var.region
   session_affinity                = "NONE"
@@ -47,7 +47,7 @@ resource "google_compute_region_backend_service" "echo-internal-tcp" {
     balancing_mode               = "CONNECTION"
     capacity_scaler              = 0
     failover                     = false
-    group                        = google_compute_region_instance_group_manager.echo.instance_group
+    group                        = google_compute_region_instance_group_manager.upstream.instance_group
     max_connections              = 0
     max_connections_per_endpoint = 0
     max_connections_per_instance = 0
