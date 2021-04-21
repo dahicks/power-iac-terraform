@@ -5,6 +5,7 @@ This demo leverages the following set of tools.  Links have been provided for in
 1. [Terraform](https://www.terraform.io/downloads.html)
 2. [jq](https://stedolan.github.io/jq/download/)
 3. [gcloud](https://cloud.google.com/sdk/docs/quickstart)
+4. [curl](https://curl.se)
 
 We are leveraging [Google Cloud Platform](https://cloud.google.com/free/) to deploy our infrastructure resources.  You'll need to have access to a Google Cloud Platform project in order to complete the exercise.
 
@@ -53,11 +54,11 @@ Next, we we'll apply the changes.  This will instruct Terraform to create our re
 terraform apply
 ```
 
-### 5) Grab Load Balancer IP from Terraform output and browse
+### 5) Test
 
-In the following code snippet, we'll retrieve the external load balancer IP from the Terraform state and use it to make an HTTP request to our upstream service through the newly built API Gateway.  
+In the following code snippet, we'll retrieve the external load balancer's IP from output `load_balancer` Terraform variable and use it to make an HTTP request (using cURL) to our upstream service through the newly built API Gateway.  
 
-> Note: It can take 5-10 minutes for the Load Balancer to come up.  Until that happens, you may receive 4XX/5XX servers.
+> Note: It can take 5-10 minutes for the Load Balancer to come up.  Until that happens, you may receive 4XX/5XX servers.  In our example below, we continously call our gateway's IP in a loop every 10 secs.
 
 ```
 LB_IP=`terraform output -json | jq -r .load_balancer.value`
