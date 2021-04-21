@@ -62,7 +62,7 @@ terraform apply
 
 In the following code snippet, we'll retrieve the external load balancer's IP from output `load_balancer` Terraform variable and use it to make an HTTP request (using cURL) to our upstream service through the newly built API Gateway.  
 
-> Note: It can take 5-10 minutes for the Load Balancer to come up.  Until that happens, you may receive 4XX/5XX servers.  In our example below, we continously call our gateway's IP in a loop every 10 secs.
+> Note: It can take 5-10 minutes for the Load Balancer to come up.  Until that happens, you may receive a 4XX/5XX status code reply.  In our example below, we continously call our gateway's IP in a loop every 10 secs.
 
 ```
 LB_IP=`terraform output -json | jq -r .load_balancer.value`
